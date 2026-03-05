@@ -60,7 +60,7 @@ GenericConfig #(
     .out(write_regs)
 );
 
-data64_t num_run;
+data64_t num_runs;
 assign num_runs = write_regs[0];
 
 for (genvar I = 0; I < N_STRM_AXI; I++) begin
