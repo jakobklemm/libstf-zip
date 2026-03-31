@@ -173,6 +173,55 @@ assign data_out.ready = out.ready;
 
 endmodule
 
+module NTaggedSkidBuffer #(
+    parameter type data_t,
+    parameter TAG_WIDTH,
+    parameter NUM_ELEMENTS
+) (
+    input logic clk,
+    input logic rst_n,
+
+    ntagged_i.s in, // #(data_t, TAG_WIDTH, NUM_ELEMENTS) 
+    ntagged_i.m out // #(data_t, TAG_WIDTH, NUM_ELEMENTS)
+);
+
+typedef logic[TAG_WIDTH - 1:0] tag_t;
+
+typedef struct packed {
+    data_t[NUM_ELEMENTS - 1:0] data;
+    tag_t[NUM_ELEMENTS - 1:0]  tag;
+    logic[NUM_ELEMENTS - 1:0]  keep;
+    logic                      last;
+} tmp_t;
+
+ready_valid_i #(tmp_t) skid_in(), skid_out();
+
+assign skid_in.data.data = in.data;
+assign skid_in.data.tag  = in.tag;
+assign skid_in.data.keep = in.keep;
+assign skid_in.data.last = in.last;
+assign skid_in.valid     = in.valid;
+assign in.ready          = skid_in.ready;
+
+SkidBuffer #(
+    .data_t(tmp_t)
+) inst_skid_buffer (
+    .clk(clk),
+    .rst_n(rst_n),
+
+    .in(skid_in),
+    .out(skid_out)
+);
+
+assign out.data       = skid_out.data.data;
+assign out.tag        = skid_out.data.tag;
+assign out.keep       = skid_out.data.keep;
+assign out.last       = skid_out.data.last;
+assign out.valid      = skid_out.valid;
+assign skid_out.ready = out.ready;
+
+endmodule
+
 module AXISkidBuffer #(
     parameter AXI4S_DATA_BITS = AXI_DATA_BITS
 ) (
