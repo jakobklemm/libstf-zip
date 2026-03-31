@@ -50,6 +50,8 @@ generate if (REGISTER == 1) begin
             end
         end
     end
+
+    assign in.ready = !out.valid || out.ready;
 end else begin
     assign out.data  = data_shifted;
     assign out.keep  = keep_shifted;
@@ -57,8 +59,8 @@ end else begin
     assign out.valid = in.valid;
 
     assign offset_out = offset_in;
-end endgenerate
 
-assign in.ready = out.ready;
+    assign in.ready = out.ready;
+end endgenerate
 
 endmodule

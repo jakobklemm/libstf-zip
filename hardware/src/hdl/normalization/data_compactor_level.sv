@@ -58,6 +58,8 @@ generate if (REGISTER) begin
             end
         end
     end
+
+    assign in.ready = !out.valid || out.ready;
 end else begin
     assign out.data  = next_data;
     assign out.keep  = next_keep;
@@ -65,8 +67,8 @@ end else begin
     assign out.valid = in.valid;
 
     assign counter_out = next_counter;
-end endgenerate
 
-assign in.ready = out.ready;
+    assign in.ready = out.ready;
+end endgenerate
 
 endmodule

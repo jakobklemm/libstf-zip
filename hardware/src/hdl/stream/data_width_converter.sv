@@ -38,7 +38,7 @@ end else begin
     logic                   last,  n_last;
     logic                   valid, n_valid;
 
-    assign in.ready = out.ready;
+    assign in.ready = !out.valid || out.ready;
 
     always_ff @(posedge clk) begin
         if (!rst_n) begin
@@ -60,7 +60,7 @@ end else begin
         n_last     = last;
         n_valid    = 1'b0;
 
-        if (out.ready) begin
+        if (!out.valid || out.ready) begin
             if (in.valid) begin
                 if (in.last) begin
                     n_slot_idx = '0;
